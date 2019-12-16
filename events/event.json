@@ -1,0 +1,22 @@
+{
+	"account": "524093264747",
+	"region": "eu-west-1",
+	"detail": {
+		"oldCommitId": "9d179fb9b80d48dd12f81b4c77854bdd203989a0",
+		"repositoryId": "960a4b26-2da2-4d47-9023-3e7d4af52d79",
+		"commitId": "91973e1d5a511ae361fa7c3675b98841ebc179ca",
+		"referenceFullName": "refs/heads/master",
+		"referenceName": "master",
+		"callerUserArn": "arn:aws:iam::524093264747:user/Stash",
+		"referenceType": "branch",
+		"repositoryName": "ldm-activity-tracker-dev",
+		"event": "referenceUpdated"
+	},
+	"detail-type": "CodeCommit Repository State Change",
+	"source": "aws.codecommit",
+	"version": "0",
+	"time": "2019-07-16T08:34:00Z",
+	"id": "28494599-80f4-dc10-f47e-824f543744b1",
+	"resources": ["arn:aws:codecommit:eu-west-1:524093264747:ldm-activity-tracker-dev"]
+}
+

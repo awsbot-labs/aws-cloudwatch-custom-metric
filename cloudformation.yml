@@ -1,0 +1,137 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: >-
+  AWSBot AWS CloudFormation template: Creates a Lambda function and role for writing custom metrics to AWS CloudWatch.
+
+Parameters:
+  DynamoDbTableName:
+    Description: "The name of the DynamoDb Table to write to."
+    Type: String
+
+  Environment: 
+    Description: "The environment e.g. dev, test, prod"
+    Type: String
+    AllowedValues:
+      - dev
+      - test
+      - prod
+
+  FunctionName:
+    Description: 'The name of the function'
+    Type: String
+
+  StsAssumeRoleArn:
+    Description: 'The Arn of a Role that the lambda functions assume to write to the dynamodb tables from other accounts.'
+    Type: String
+
+Resources:
+  LambdaFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code:
+        ZipFile: function.zip
+      Description: Lambda function for putting metrics to a data source.
+      FunctionName: !Ref FunctionName
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt
+        - LambdaExecutionRole
+        - Arn
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref Environment
+          AWS_ACCOUNT_ID: !Ref 'AWS::AccountId'
+          TABLE_NAME: !Ref DynamoDbTableName
+          STS_ASSUME_ROLE_ARN: !Ref StsAssumeRoleArn
+      Runtime: python2.7
+      MemorySize: '128'
+      Timeout: '10'
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+  CodeCommitEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "EventRule"
+      EventPattern:
+        source:
+          - "aws.codecommit"
+        detail-type:
+          - "CodeCommit Repository State Change"
+      State: "ENABLED"
+      Targets:
+        -
+          Arn:
+            Fn::GetAtt:
+              - "LambdaFunction"
+              - "Arn"
+          Id: "TargetFunctionV1"
+
+  PermissionForEventsToInvokeLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Ref: "LambdaFunction"
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn:
+        Fn::GetAtt:
+          - "CodeCommitEventRule"
+          - "Arn"
+
+  LambdaExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: CloudWatchLogsPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: '*'
+        - PolicyName: CloudWatchMetricsPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'cloudwatch:PutMetricData'
+                Resource: '*'
+        - PolicyName: DynamoDBPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'dynamodb:PutItem'
+                Resource: '*'
+        - PolicyName: CodeCommitPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'codecommit:GetCommit'
+                Resource: '*'
+        - PolicyName: STSPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'sts:AssumeRole'
+                Resource: '*'

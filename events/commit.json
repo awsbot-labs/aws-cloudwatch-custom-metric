@@ -1,0 +1,30 @@
+{
+	"commit": {
+		"committer": {
+			"date": "1563266022 +0200",
+			"name": "David Reay",
+			"email": "David.Reay@ext.gfk.com"
+		},
+		"author": {
+			"date": "1563266022 +0200",
+			"name": "David Reay",
+			"email": "David.Reay@ext.gfk.com"
+		},
+		"commitId": "91973e1d5a511ae361fa7c3675b98841ebc179ca",
+		"treeId": "f8db90f5c4ef8941ae17e345f3a9d342785d6382",
+		"additionalData": "",
+		"parents": ["9d179fb9b80d48dd12f81b4c77854bdd203989a0"],
+		"message": "LEOAM-5579: corrected print syntax\n"
+	},
+	"ResponseMetadata": {
+		"RetryAttempts": 0,
+		"HTTPStatusCode": 200,
+		"RequestId": "bd2f33c0-483b-4429-a0ba-0838c4fdb656",
+		"HTTPHeaders": {
+			"x-amzn-requestid": "bd2f33c0-483b-4429-a0ba-0838c4fdb656",
+			"date": "Sat, 20 Jul 2019 10:36:31 GMT",
+			"content-length": "425",
+			"content-type": "application/x-amz-json-1.1"
+		}
+	}
+}
